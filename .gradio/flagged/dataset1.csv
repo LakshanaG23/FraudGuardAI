@@ -1,0 +1,2 @@
+Step,Transaction Type,Amount,Origin Account ID,Old Balance (Origin),New Balance (Origin),Destination Account ID,Old Balance (Dest),New Balance (Dest),output,timestamp
+200,TRANSFER,10000,C12345678,5000,0,C87654321,10000,20000,,2025-05-20 00:09:48.979692

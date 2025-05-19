@@ -5,6 +5,7 @@ print("✅ Gradio imported")
 
 import numpy as np
 print("✅ NumPy imported")
+
 from preprocessing import preprocess_input
 print("✅ Preprocessing imported")
 
@@ -16,9 +17,9 @@ autoencoder, xgb_model = load_models()
 print("✅ Models loaded")
 
 
-
 def predict_fraud(step, type, amount, nameOrig, oldbalanceOrg, newbalanceOrig,
                   nameDest, oldbalanceDest, newbalanceDest):
+    # Step 1: Construct dictionary
     data = {
         "step": step,
         "type": type,
@@ -29,13 +30,15 @@ def predict_fraud(step, type, amount, nameOrig, oldbalanceOrg, newbalanceOrig,
         "nameDest": nameDest,
         "oldbalanceDest": oldbalanceDest,
         "newbalanceDest": newbalanceDest,
-        "isFraud": 0,
-        "isFlaggedFraud": 0
+        "isFraud": 0,              # dummy for schema match
+        "isFlaggedFraud": 0        # dummy for schema match
     }
 
+    # Step 2: Preprocess input
     X = preprocess_input(data)
 
-    reconstructed = autoencoder.predict(X)
+    # Step 3: Get predictions
+    reconstructed = autoencoder.predict(X, verbose=0)
     recon_error = np.mean(np.square(X - reconstructed), axis=1)[0]
     xgb_proba = xgb_model.predict_proba(X)[0][1]
 
@@ -52,6 +55,8 @@ def predict_fraud(step, type, amount, nameOrig, oldbalanceOrg, newbalanceOrig,
         "Final Verdict": verdict
     }
 
+
+# Step 4: Gradio UI setup
 inputs = [
     gr.Number(label="Step"),
     gr.Dropdown(["PAYMENT", "TRANSFER", "CASH_OUT", "DEBIT", "CASH_IN"], label="Transaction Type"),
@@ -72,7 +77,7 @@ iface = gr.Interface(
     description="Detect fraud using Autoencoder (anomaly detection) and XGBoost (supervised learning)"
 )
 
+# Step 5: Launch
 if __name__ == "__main__":
-    print("Launching Gradio app...")
+    print("🚀 Launching Gradio app...")
     iface.launch(share=True)
-
